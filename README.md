@@ -1,0 +1,2 @@
+# CardCompare
+Compare Magic Cards!
