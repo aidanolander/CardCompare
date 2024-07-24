@@ -1,7 +1,3 @@
-# To run this in terminal, use:
-# streamlit run CardComparinator.py --server.enableXsrfProtection false
-
-
 ### IMPORTS SECTION
 
 import streamlit as st
@@ -10,8 +6,6 @@ import time
 import pandas as pd
 from io import BytesIO
 import numpy as np
-
-
 
 ### FUNCTIONS SECTION
 
@@ -35,7 +29,6 @@ def get_card_details(card_name):
     else:
         return f"An error occurred: {response.status_code}"
     
-
 def get_multiple_cards(card_names):
     cards_details = []
     for card_name in card_names:
@@ -68,8 +61,6 @@ def to_excel(df):
 ### BEGINNING STREAMLIT SETUP SECTION
 st.title("Card Comparison for Deck Building")
 
-
-
 ### INPUT EXCEL SHEET SECTION
 
 # check if the file has been uploaded before
@@ -79,43 +70,65 @@ if 'uploaded_file' not in st.session_state:
 # create a placeholder for the file uploader
 uploader_placeholder = st.empty()
 
-
-
-# create a placeholder
+# create a placeholder for containers
 placeholder = st.empty()
 
 
 if st.session_state.uploaded_file is None:
-    # add initial content to the placeholder
+    # add initial content to the container
     with placeholder.container():
-        uploaded_file = uploader_placeholder.file_uploader("Upload an Excel file", type="xlsx")
-        if uploaded_file:
-            st.session_state.uploaded_file = uploaded_file
-            # read the excel file 
-            df = pd.read_excel(st.session_state.uploaded_file)
-            # clear the placeholder once a file is uploaded
-            uploader_placeholder.empty()
-            consider_list = [x for x in df['considering'] if pd.notna(x)]
-            current_list = [x for x in df['current'] if pd.notna(x)]
 
-            ### CREATE DATAFRAMES SECTION
+        cols = st.columns(5)
+        col1, col2, col3, col4, col5 = cols
 
-            if 'consider_df' not in st.session_state:
-                # create an initial empty DataFrame
-                st.session_state.consider_df = clean_card_deets(consider_list)
-
-            if 'current_df' not in st.session_state:
-                # create an initial empty DataFrame
-                st.session_state.current_df = clean_card_deets(current_list)
+        # normal image urls
+        col1.image('https://cards.scryfall.io/normal/front/b/f/bf1ef8ec-d915-41f2-b087-3d6d82e3db85.jpg?1591319833', use_column_width=True) # Akroma, Angel of Wrath
+        col2.image('https://cards.scryfall.io/normal/front/f/1/f1fdb9bb-09a2-4ff7-bcd4-35ea33c1b752.jpg?1676452620', use_column_width=True) # Icebreaker Kraken
+        col3.image('https://cards.scryfall.io/normal/front/5/7/57fab4fc-c8de-47ef-a717-3adb58c2f5b6.jpg?1562460627', use_column_width=True) # Demon of Death's Gate
 
 
-            if 'DMTC_df' not in st.session_state:
-                # create an initial empty DMTC DataFrame with columns
-                st.session_state.DMTC_df = pd.DataFrame(columns=[
-                    'name', 'type_line', 'mana_cost', 'cmc', 'oracle_text', 
-                    'usd_price', 'power', 'toughness', 'released_at', 'image_uris'])
-            placeholder.empty()
-            st.rerun()
+        # large image urls
+        # col1.image('https://cards.scryfall.io/large/front/b/f/bf1ef8ec-d915-41f2-b087-3d6d82e3db85.jpg?1591319833', use_column_width=True) # Akroma, Angel of Wrath
+        # col2.image('https://cards.scryfall.io/large/front/f/1/f1fdb9bb-09a2-4ff7-bcd4-35ea33c1b752.jpg?1676452620', use_column_width=True) # Icebreaker Kraken
+        # col3.image('https://cards.scryfall.io/large/front/5/7/57fab4fc-c8de-47ef-a717-3adb58c2f5b6.jpg?1562460627', use_column_width=True) # Demon of Death's Gate
+        with col3:
+            uploaded_file = uploader_placeholder.file_uploader("Upload an Excel file", type="xlsx")
+            if uploaded_file:
+                st.session_state.uploaded_file = uploaded_file
+                # read the excel file 
+                df = pd.read_excel(st.session_state.uploaded_file)
+                # clear the placeholder once a file is uploaded
+                uploader_placeholder.empty()
+                consider_list = [x for x in df['considering'] if pd.notna(x)]
+                current_list = [x for x in df['current'] if pd.notna(x)]
+
+                ### CREATE DATAFRAMES SECTION
+
+                if 'consider_df' not in st.session_state:
+                    # create an initial empty DataFrame
+                    st.session_state.consider_df = clean_card_deets(consider_list)
+
+                if 'current_df' not in st.session_state:
+                    # create an initial empty DataFrame
+                    st.session_state.current_df = clean_card_deets(current_list)
+
+
+                if 'DMTC_df' not in st.session_state:
+                    # create an initial empty DMTC DataFrame with columns
+                    st.session_state.DMTC_df = pd.DataFrame(columns=[
+                        'name', 'type_line', 'mana_cost', 'cmc', 'oracle_text', 
+                        'usd_price', 'power', 'toughness', 'released_at', 'image_uris'])
+                placeholder.empty()
+                st.rerun()
+
+        # normal image urls
+        col4.image('https://cards.scryfall.io/normal/front/c/9/c93dd6cc-53e8-4c67-8838-180b19f02088.jpg?1689997653', use_column_width=True) # Avatar of Slaughter
+        col5.image('https://cards.scryfall.io/normal/front/b/9/b9f1dbdc-e590-48a4-bc52-e9e4e907fb82.jpg?1690003248', use_column_width=True) # Nyxborn Behemoth
+
+        # large image urls
+        # col4.image('https://cards.scryfall.io/large/front/c/9/c93dd6cc-53e8-4c67-8838-180b19f02088.jpg?1689997653', use_column_width=True) # Avatar of Slaughter
+        # col5.image('https://cards.scryfall.io/large/front/b/9/b9f1dbdc-e590-48a4-bc52-e9e4e907fb82.jpg?1690003248', use_column_width=True) # Nyxborn Behemoth
+
 
 else:
     if len(st.session_state.consider_df) > 0:
@@ -135,8 +148,9 @@ else:
 
             with col1:
                 # display current image from the list
-                st.image(st.session_state.consider_df.image_uris[0]['normal'], caption="Left Image")
-                if st.button("Left Button"):
+                st.image(st.session_state.consider_df.image_uris[0]['normal'], caption="Considering")
+                st.write(f"USD Price: {st.session_state.consider_df['usd_price'][0]}")
+                if st.button(st.session_state.consider_df['name'][0], use_container_width=True):
                     # add consider_df[0] to current_df
                     st.session_state.current_df = add_row_to_df(st.session_state.consider_df[:1], st.session_state.current_df)
                     # add current_df[st.session_state.current_card_index] to consider_df
@@ -149,8 +163,10 @@ else:
                     st.rerun()  #rerun the script to update the image
             
             with col2:
-                st.image(st.session_state.current_df.image_uris[st.session_state.current_card_index]['normal'], caption="Right Image")
-                if st.button("Right Button"):
+                st.image(st.session_state.current_df.image_uris[st.session_state.current_card_index]['normal'], caption="In Deck")
+                st.write(f"USD Price: {st.session_state.current_df['usd_price'][st.session_state.current_card_index]}")
+
+                if st.button(st.session_state.current_df['name'][st.session_state.current_card_index], use_container_width=True):
                     # add one to loss count
                     st.session_state.loss_count += 1
 
@@ -191,6 +207,7 @@ else:
         st.write('Something went wrong - restart page and try again')
 
  
+
 
     
 
