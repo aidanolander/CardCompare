@@ -1,3 +1,4 @@
+
 ### IMPORTS SECTION
 
 import streamlit as st
@@ -6,6 +7,8 @@ import time
 import pandas as pd
 from io import BytesIO
 import numpy as np
+
+
 
 ### FUNCTIONS SECTION
 
@@ -29,6 +32,7 @@ def get_card_details(card_name):
     else:
         return f"An error occurred: {response.status_code}"
     
+
 def get_multiple_cards(card_names):
     cards_details = []
     for card_name in card_names:
@@ -61,6 +65,8 @@ def to_excel(df):
 ### BEGINNING STREAMLIT SETUP SECTION
 st.title("Card Comparison for Deck Building")
 
+
+
 ### INPUT EXCEL SHEET SECTION
 
 # check if the file has been uploaded before
@@ -87,12 +93,13 @@ if st.session_state.uploaded_file is None:
         col3.image('https://cards.scryfall.io/normal/front/5/7/57fab4fc-c8de-47ef-a717-3adb58c2f5b6.jpg?1562460627', use_column_width=True) # Demon of Death's Gate
 
 
+
         # large image urls
         # col1.image('https://cards.scryfall.io/large/front/b/f/bf1ef8ec-d915-41f2-b087-3d6d82e3db85.jpg?1591319833', use_column_width=True) # Akroma, Angel of Wrath
         # col2.image('https://cards.scryfall.io/large/front/f/1/f1fdb9bb-09a2-4ff7-bcd4-35ea33c1b752.jpg?1676452620', use_column_width=True) # Icebreaker Kraken
         # col3.image('https://cards.scryfall.io/large/front/5/7/57fab4fc-c8de-47ef-a717-3adb58c2f5b6.jpg?1562460627', use_column_width=True) # Demon of Death's Gate
         with col3:
-            uploaded_file = uploader_placeholder.file_uploader("Upload an Excel file", type="xlsx")
+            uploaded_file = uploader_placeholder.file_uploader("Upload an Excel file with 2 columns, \'considering\' and \'current\'", type="xlsx")
             if uploaded_file:
                 st.session_state.uploaded_file = uploaded_file
                 # read the excel file 
@@ -198,6 +205,7 @@ else:
 
             excel_data = to_excel(pd.DataFrame({'cut_cards': cut_column,'kept_cards': kept_column}))
 
+            st.write('All cards sorted. Click to download results.')
             st.download_button(
                 label='Download Excel File',
                 data=excel_data,
