@@ -10,7 +10,8 @@ import numpy as np
 
 st.set_page_config(
     page_title='Comparinator',
-    page_icon='https://i.pinimg.com/564x/7b/87/3c/7b873c21da94ab660be4590250c8fb86.jpg')
+    page_icon='https://i.pinimg.com/564x/7b/87/3c/7b873c21da94ab660be4590250c8fb86.jpg', # This is an emoji shortcode. Could be a URL too.
+)
 
 
 ### FUNCTIONS SECTION
@@ -112,10 +113,7 @@ if st.session_state.uploaded_file is None:
 
 
 
-        # large image urls
-        # col1.image('https://cards.scryfall.io/large/front/b/f/bf1ef8ec-d915-41f2-b087-3d6d82e3db85.jpg?1591319833', use_column_width=True) # Akroma, Angel of Wrath
-        # col2.image('https://cards.scryfall.io/large/front/f/1/f1fdb9bb-09a2-4ff7-bcd4-35ea33c1b752.jpg?1676452620', use_column_width=True) # Icebreaker Kraken
-        # col3.image('https://cards.scryfall.io/large/front/5/7/57fab4fc-c8de-47ef-a717-3adb58c2f5b6.jpg?1562460627', use_column_width=True) # Demon of Death's Gate
+
         with col3:
             uploaded_file = uploader_placeholder.file_uploader("Upload an Excel file with 2 columns, \'considering\' and \'current\'", type="xlsx")
             if uploaded_file:
@@ -126,6 +124,12 @@ if st.session_state.uploaded_file is None:
                 uploader_placeholder.empty()
                 consider_list = [x for x in df['considering'] if pd.notna(x)]
                 current_list = [x for x in df['current'] if pd.notna(x)]
+            
+            if st.button("Use Demo Data", use_container_width=True):
+                consider_list = ['Beast Whisperer', 'Branch of Vitu-Ghazi', 'Experiment Twelve']
+                current_list = ['Mystic Forge', 'Nervous Gardener', 'Panoptic Projektor', 'Primordial Mist', 'Printlifter Ooze', 'Rampant Growth']
+                uploader_placeholder.empty()
+                st.session_state.uploaded_file = 'demo'
 
                 ### CREATE DATAFRAMES SECTION
 
@@ -150,9 +154,7 @@ if st.session_state.uploaded_file is None:
         col4.image('https://cards.scryfall.io/normal/front/c/9/c93dd6cc-53e8-4c67-8838-180b19f02088.jpg?1689997653', use_column_width=True) # Avatar of Slaughter
         col5.image('https://cards.scryfall.io/normal/front/b/9/b9f1dbdc-e590-48a4-bc52-e9e4e907fb82.jpg?1690003248', use_column_width=True) # Nyxborn Behemoth
 
-        # large image urls
-        # col4.image('https://cards.scryfall.io/large/front/c/9/c93dd6cc-53e8-4c67-8838-180b19f02088.jpg?1689997653', use_column_width=True) # Avatar of Slaughter
-        # col5.image('https://cards.scryfall.io/large/front/b/9/b9f1dbdc-e590-48a4-bc52-e9e4e907fb82.jpg?1690003248', use_column_width=True) # Nyxborn Behemoth
+
 
 
 else:
@@ -258,6 +260,7 @@ else:
     else:
         st.write('Something went wrong - restart page and try again')
 
+ 
 
     
 
