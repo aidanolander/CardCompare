@@ -174,6 +174,7 @@ else:
             col1, col2 = st.columns([1, 1])
 
             with col1:
+                st.write("Considering List")
                 # display current image from the list
                 st.image(st.session_state.consider_df.image_uris[0]['normal'], caption=f"{len(st.session_state.consider_df)} remaining in list")
                 st.write(f"USD Price: ${st.session_state.consider_df['usd_price'][0]}")
@@ -196,6 +197,7 @@ else:
                     st.rerun()  #rerun the script to update the image
             
             with col2:
+                st.write("Current List")
                 st.image(st.session_state.current_df.image_uris[st.session_state.current_card_index]['normal'], caption=f"{st.session_state.current_card_index+1}/{len(st.session_state.current_df)}")
                 st.write(f"USD Price: ${st.session_state.current_df['usd_price'][st.session_state.current_card_index]}")
 
