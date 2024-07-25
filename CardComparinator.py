@@ -10,8 +10,7 @@ import numpy as np
 
 st.set_page_config(
     page_title='Comparinator',
-    page_icon='https://i.pinimg.com/564x/7b/87/3c/7b873c21da94ab660be4590250c8fb86.jpg', # This is an emoji shortcode. Could be a URL too.
-)
+    page_icon='https://i.pinimg.com/564x/7b/87/3c/7b873c21da94ab660be4590250c8fb86.jpg')
 
 
 ### FUNCTIONS SECTION
