@@ -8,6 +8,10 @@ import pandas as pd
 from io import BytesIO
 import numpy as np
 
+st.set_page_config(
+    page_title='Comparinator',
+    page_icon='https://i.pinimg.com/564x/7b/87/3c/7b873c21da94ab660be4590250c8fb86.jpg', # This is an emoji shortcode. Could be a URL too.
+)
 
 
 ### FUNCTIONS SECTION
@@ -60,6 +64,21 @@ def to_excel(df):
     with pd.ExcelWriter(output, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name='Sheet1')
     return output.getvalue()
+
+
+def kept_card_deets(card_names):
+
+    card_df = pd.DataFrame(get_multiple_cards(card_names))
+    card_df['usd_price'] = card_df['prices'].apply(lambda x: x.get('usd', 'N/A'))
+
+    output_card_df = card_df[['name', 'type_line', 'mana_cost', 
+                            'cmc', 'oracle_text', 'usd_price', 
+                            'power', 'toughness','released_at']]
+    output_card_df['cmc'] = output_card_df['cmc'].astype('int32')
+    output_card_df['usd_price'] = output_card_df['usd_price'].astype('float64')
+    output_card_df['released_at'] = pd.to_datetime(output_card_df['released_at'])
+
+    return output_card_df
 
 
 ### BEGINNING STREAMLIT SETUP SECTION
@@ -155,8 +174,8 @@ else:
 
             with col1:
                 # display current image from the list
-                st.image(st.session_state.consider_df.image_uris[0]['normal'], caption="Considering")
-                st.write(f"USD Price: {st.session_state.consider_df['usd_price'][0]}")
+                st.image(st.session_state.consider_df.image_uris[0]['normal'], caption=f"{len(st.session_state.consider_df)} remaining in list")
+                st.write(f"USD Price: ${st.session_state.consider_df['usd_price'][0]}")
                 if st.button(st.session_state.consider_df['name'][0], use_container_width=True):
                     # add consider_df[0] to current_df
                     st.session_state.current_df = add_row_to_df(st.session_state.consider_df[:1], st.session_state.current_df)
@@ -168,10 +187,16 @@ else:
                     st.session_state.current_df = remove_row_from_df(st.session_state.current_card_index, st.session_state.current_df)
                     st.session_state.loss_count = 0
                     st.rerun()  #rerun the script to update the image
+                if st.button('Cut Card Now', use_container_width=True):
+                    # add left card to DMTC_df
+                    st.session_state.DMTC_df = add_row_to_df(st.session_state.consider_df[:1], st.session_state.DMTC_df)
+                    # remove left card from consider_df
+                    st.session_state.consider_df = remove_row_from_df(0, st.session_state.consider_df)
+                    st.rerun()  #rerun the script to update the image
             
             with col2:
-                st.image(st.session_state.current_df.image_uris[st.session_state.current_card_index]['normal'], caption="In Deck")
-                st.write(f"USD Price: {st.session_state.current_df['usd_price'][st.session_state.current_card_index]}")
+                st.image(st.session_state.current_df.image_uris[st.session_state.current_card_index]['normal'], caption=f"{st.session_state.current_card_index+1}/{len(st.session_state.current_df)}")
+                st.write(f"USD Price: ${st.session_state.current_df['usd_price'][st.session_state.current_card_index]}")
 
                 if st.button(st.session_state.current_df['name'][st.session_state.current_card_index], use_container_width=True):
                     # add one to loss count
@@ -202,19 +227,37 @@ else:
             # create new columns, padding the shorter one with NaN
             cut_column = st.session_state.DMTC_df['name'].tolist() + [np.nan] * (max_len - len_cut)
             kept_column = st.session_state.current_df['name'].tolist() + [np.nan] * (max_len - len_kept)
+            kept_list = st.session_state.current_df['name'].tolist()
 
-            excel_data = to_excel(pd.DataFrame({'cut_cards': cut_column,'kept_cards': kept_column}))
+            detailed_kept_df = to_excel(kept_card_deets(kept_list))
+
+            cut_kept_excel_data = to_excel(pd.DataFrame({'cut_cards': cut_column,'kept_cards': kept_column}))
+            st.write("")
+            st.write("")
+            st.write("")
 
             st.write('All cards sorted. Click to download results.')
-            st.download_button(
-                label='Download Excel File',
-                data=excel_data,
-                file_name='comparison_results.xlsx',
-                mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+            # layout with two columns
+            col1, col2 = st.columns([1, 1])
+            
+
+            with col1: 
+                st.download_button(
+                    label='Cut & Kept Cards',
+                    data=cut_kept_excel_data,
+                    file_name='cut_kept_results.xlsx',
+                    mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                    use_container_width=True)
+            with col2:
+                st.download_button(
+                    label='Detailed Kept Cards',
+                    data=detailed_kept_df,
+                    file_name='detailed_kept_results.xlsx',
+                    mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 
+                    use_container_width=True)
+
     else:
         st.write('Something went wrong - restart page and try again')
-
- 
 
 
     
